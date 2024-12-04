@@ -133,6 +133,8 @@ defmodule Xandra.Cluster.ControlConnection do
     end
   catch
     kind, reason ->
+      IO.puts("KIND: #{inspect kind}")
+      IO.puts("REASON: #{inspect reason}")
       execute_telemetry(state, [:control_connection, :failed_to_connect], %{}, %{reason: reason})
       {:stop, {:__caught__, kind, reason, __STACKTRACE__}}
   end
