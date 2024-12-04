@@ -117,6 +117,7 @@ defmodule Xandra.Cluster.ControlConnection do
   def init(%__MODULE__{} = state) do
     case connect(state) do
       {:ok, state, peers} ->
+        IO.puts("CONNECTED TO PEERS: #{inspect peers}")
         state = refresh_topology(state, peers)
 
         execute_telemetry(state, [:control_connection, :connected], %{}, %{})
@@ -127,6 +128,7 @@ defmodule Xandra.Cluster.ControlConnection do
         {:ok, state}
 
       {:error, reason} ->
+        IO.puts("ERROR CONNECTING: #{inspect reason}")
         execute_telemetry(state, [:control_connection, :failed_to_connect], %{}, %{reason: reason})
 
         {:stop, {:shutdown, reason}}
