@@ -205,10 +205,12 @@ defmodule Xandra.Cluster.Pool do
   # We have never connected, but we already flushed once, so we won't keep adding requests to
   # the queue.
   def handle_event({:call, from}, :checkout, :never_connected, %__MODULE__{checkout_queue: nil}) do
+    IO.puts("NEVER CONNECTED, QUEUE IS NIL")
     {:keep_state_and_data, {:reply, from, {:error, :empty}}}
   end
 
   def handle_event({:call, from}, :checkout, :never_connected, %__MODULE__{} = data) do
+    IO.puts("NEVER CONNECTED, CHECKOU QUEUE IS NOT NIL")
     checkout_queue(queue: queue, max_size: max_size) = data.checkout_queue
 
     if :queue.len(queue) == max_size do
@@ -225,11 +227,13 @@ defmodule Xandra.Cluster.Pool do
   end
 
   def handle_event({:call, from}, :checkout, :has_connected_once, %__MODULE__{} = data) do
+    IO.puts("CONNECTED ONCE")
     {data, reply_action} = checkout_connection(data, from)
     {:keep_state, data, reply_action}
   end
 
   def handle_event({:call, from}, :connected_hosts, _state, %__MODULE__{} = data) do
+    IO.puts("HANDLING CONNECTED HOSTS")
     connected_hosts =
       for %{status: :connected, pool_pid: pool_pid, host: host} <- Map.values(data.peers),
           is_pid(pool_pid) do
